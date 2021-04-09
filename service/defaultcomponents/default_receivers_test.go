@@ -74,6 +74,9 @@ func TestDefaultReceivers(t *testing.T) {
 		{
 			receiver: "zipkin",
 		},
+		{
+			receiver: "prometheusremotewrite",
+		},
 	}
 
 	assert.Equal(t, len(tests), len(rcvrFactories))
