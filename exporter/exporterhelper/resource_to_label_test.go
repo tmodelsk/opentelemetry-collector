@@ -29,7 +29,7 @@ func TestConvertResourceToLabels(t *testing.T) {
 	assert.Equal(t, 1, md.ResourceMetrics().At(0).Resource().Attributes().Len())
 	assert.Equal(t, 1, md.ResourceMetrics().At(0).InstrumentationLibraryMetrics().At(0).Metrics().At(0).IntSum().DataPoints().At(0).LabelsMap().Len())
 
-	cloneMd := convertResourceToLabels(md)
+	cloneMd := convertResourceToLabels(md, map[string]bool{})
 
 	// After converting resource to labels
 	assert.Equal(t, 1, cloneMd.ResourceMetrics().At(0).Resource().Attributes().Len())
@@ -53,7 +53,7 @@ func TestConvertResourceToLabelsAllDataTypesEmptyDataPoint(t *testing.T) {
 	assert.Equal(t, 0, md.ResourceMetrics().At(0).InstrumentationLibraryMetrics().At(0).Metrics().At(4).Histogram().DataPoints().At(0).LabelsMap().Len())
 	assert.Equal(t, 0, md.ResourceMetrics().At(0).InstrumentationLibraryMetrics().At(0).Metrics().At(5).IntHistogram().DataPoints().At(0).LabelsMap().Len())
 
-	cloneMd := convertResourceToLabels(md)
+	cloneMd := convertResourceToLabels(md, map[string]bool{})
 
 	// After converting resource to labels
 	assert.Equal(t, 1, cloneMd.ResourceMetrics().At(0).Resource().Attributes().Len())

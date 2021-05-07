@@ -152,10 +152,11 @@ func WithResourceToTelemetryConversion(resourceToTelemetrySettings ResourceToTel
 // baseExporter contains common fields between different exporter types.
 type baseExporter struct {
 	component.Component
-	cfg                        config.Exporter
-	sender                     requestSender
-	qrSender                   *queuedRetrySender
-	convertResourceToTelemetry bool
+	cfg                                          config.Exporter
+	sender                                       requestSender
+	qrSender                                     *queuedRetrySender
+	convertResourceToTelemetry                   bool
+	convertResourceToTelemetryExcludedAttributes map[string]bool
 }
 
 func newBaseExporter(cfg config.Exporter, logger *zap.Logger, options ...Option) *baseExporter {
@@ -164,12 +165,23 @@ func newBaseExporter(cfg config.Exporter, logger *zap.Logger, options ...Option)
 		Component:                  componenthelper.New(bs.componentOptions...),
 		cfg:                        cfg,
 		convertResourceToTelemetry: bs.ResourceToTelemetrySettings.Enabled,
+		convertResourceToTelemetryExcludedAttributes: sliceToStringSet(bs.ResourceToTelemetrySettings.ExcludeAttributes),
 	}
 
 	be.qrSender = newQueuedRetrySender(cfg.Name(), bs.QueueSettings, bs.RetrySettings, &timeoutSender{cfg: bs.TimeoutSettings}, logger)
 	be.sender = be.qrSender
 
 	return be
+}
+
+// sliceToSet converts slice of strings to set of strings
+// Returns the set of strings
+func sliceToStringSet(slice []string) map[string]bool {
+	set := make(map[string]bool, len(slice))
+	for _, s := range slice {
+		set[s] = true
+	}
+	return set
 }
 
 // wrapConsumerSender wraps the consumer sender (the sender that uses retries and timeout) with the given wrapper.

@@ -23,23 +23,26 @@ import (
 type ResourceToTelemetrySettings struct {
 	// Enabled indicates whether to not convert resource attributes to metric labels
 	Enabled bool `mapstructure:"enabled"`
+	// Set of attribute names to exclude when converting resource attributes to metric labels
+	ExcludeAttributes []string `mapstructure:"exclude_attributes"`
 }
 
 // defaultResourceToTelemetrySettings returns the default settings for ResourceToTelemetrySettings.
 func defaultResourceToTelemetrySettings() ResourceToTelemetrySettings {
 	return ResourceToTelemetrySettings{
-		Enabled: false,
+		Enabled:           false,
+		ExcludeAttributes: []string{},
 	}
 }
 
-// convertResourceToLabels converts all resource attributes to metric labels
-func convertResourceToLabels(md pdata.Metrics) pdata.Metrics {
+// convertResourceToLabels converts all resource attributes to metric labels except excludeAttributes set
+func convertResourceToLabels(md pdata.Metrics, excludeAttributes map[string]bool) pdata.Metrics {
 	cloneMd := md.Clone()
 	rms := cloneMd.ResourceMetrics()
 	for i := 0; i < rms.Len(); i++ {
 		resource := rms.At(i).Resource()
 
-		labelMap := extractLabelsFromResource(&resource)
+		labelMap := extractLabelsFromResource(&resource, excludeAttributes)
 
 		ilms := rms.At(i).InstrumentationLibraryMetrics()
 		for j := 0; j < ilms.Len(); j++ {
@@ -56,13 +59,16 @@ func convertResourceToLabels(md pdata.Metrics) pdata.Metrics {
 
 // extractAttributesFromResource extracts the attributes from a given resource and
 // returns them as a StringMap.
-func extractLabelsFromResource(resource *pdata.Resource) pdata.StringMap {
+func extractLabelsFromResource(resource *pdata.Resource, excludeAttributes map[string]bool) pdata.StringMap {
 	labelMap := pdata.NewStringMap()
 
 	attrMap := resource.Attributes()
 	attrMap.ForEach(func(k string, av pdata.AttributeValue) {
-		stringLabel := tracetranslator.AttributeValueToString(av, false)
-		labelMap.Upsert(k, stringLabel)
+		_, shouldBeSkipped := excludeAttributes[k]
+		if !shouldBeSkipped {
+			stringLabel := tracetranslator.AttributeValueToString(av, false)
+			labelMap.Upsert(k, stringLabel)
+		}
 	})
 	return labelMap
 }

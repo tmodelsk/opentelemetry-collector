@@ -69,7 +69,7 @@ type metricsExporter struct {
 
 func (mexp *metricsExporter) ConsumeMetrics(ctx context.Context, md pdata.Metrics) error {
 	if mexp.baseExporter.convertResourceToTelemetry {
-		md = convertResourceToLabels(md)
+		md = convertResourceToLabels(md, mexp.baseExporter.convertResourceToTelemetryExcludedAttributes)
 	}
 	return mexp.sender.send(newMetricsRequest(ctx, md, mexp.pusher))
 }
