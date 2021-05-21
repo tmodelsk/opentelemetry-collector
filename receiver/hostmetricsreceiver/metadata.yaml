@@ -108,19 +108,15 @@ metrics:
 
   process.memory.physical_usage:
     description: The amount of physical memory in use.
-    unit: By
+    unit: B
     data:
-      type: int sum
-      aggregation: cumulative
-      monotonic: false
+      type: int gauge
 
   process.memory.virtual_usage:
     description: Virtual memory size.
-    unit: By
+    unit: B
     data:
-      type: int sum
-      aggregation: cumulative
-      monotonic: false
+      type: int gauge
 
   process.disk.io:
     description: Disk bytes transferred.

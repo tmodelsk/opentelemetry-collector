@@ -217,10 +217,8 @@ var Metrics = &metricStruct{
 		func(metric pdata.Metric) {
 			metric.SetName("process.memory.physical_usage")
 			metric.SetDescription("The amount of physical memory in use.")
-			metric.SetUnit("By")
-			metric.SetDataType(pdata.MetricDataTypeIntSum)
-			metric.IntSum().SetIsMonotonic(false)
-			metric.IntSum().SetAggregationTemporality(pdata.AggregationTemporalityCumulative)
+			metric.SetUnit("B")
+			metric.SetDataType(pdata.MetricDataTypeIntGauge)
 		},
 	},
 	&metricImpl{
@@ -228,10 +226,8 @@ var Metrics = &metricStruct{
 		func(metric pdata.Metric) {
 			metric.SetName("process.memory.virtual_usage")
 			metric.SetDescription("Virtual memory size.")
-			metric.SetUnit("By")
-			metric.SetDataType(pdata.MetricDataTypeIntSum)
-			metric.IntSum().SetIsMonotonic(false)
-			metric.IntSum().SetAggregationTemporality(pdata.AggregationTemporalityCumulative)
+			metric.SetUnit("B")
+			metric.SetDataType(pdata.MetricDataTypeIntGauge)
 		},
 	},
 	&metricImpl{
